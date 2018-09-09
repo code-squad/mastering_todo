@@ -34,6 +34,7 @@ const todo = (function() {
     };
   })();
 
+  // TODO: 상태가 done일때 시간을 노출
   const show = function(state) {
     const [selectedState] = [...state];
     const stateType = ({ state }) => state === selectedState;
@@ -46,11 +47,19 @@ const todo = (function() {
     return tasks.filter(stateType).reduce(showLog, '');
   };
 
-  const update = function() {
-    return () => {
+  // TODO: 상태가 doing으로 변경될때 시간 기억
+  const update = (() => {
+    return (args) => {
+      const [index, state] = args;
+
+      tasks.find((task) => {
+        if (task.id === Number(index)) {
+          task.state = state;
+        }
+      });
       printTodo();
     };
-  };
+  })();
 
   return {
     add,
@@ -67,6 +76,7 @@ function command(instruction) {
 
   todo[actionType](args);
 }
+
 command('add$자바스크립트 공부하기');
 command('add$자바 공부하기');
 command('add$C 공부하기');
