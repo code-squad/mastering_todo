@@ -1,3 +1,5 @@
+const TASK = require('./task.js');
+
 /**
   * 1. 할일
   * 1-1) 상태 : todo, doing, done
@@ -21,31 +23,71 @@
   * - command("show$상태");
   * - show일 경우 상태별 출력을 한다. 1번째 인덱스는 상태값
   */
- 
-const pipe = (...functions) => args => functions.reduce((arg, nextFn) => nextFn(arg), args);
-const extractCommand = pipe(
-  (command) => command.split("$")[0],
-  (command) => command.toLowerCase(),
-  (command) => command.trim()
-)(command);
 
-const addTask = function() {
 
+const pipeline = (...functions) => args => functions.reduce((arg, nextFn) => nextFn(arg), args);
+const splitCommand = (regExp) => (str) => str.split(regExp)[0];
+const toLowerCase = (str) => str.toLowerCase();
+const trim = (str) => str.trim();
+const extractCommand = pipeline(
+  splitCommand("$"),
+  trim,
+  toLowerCase,
+);
+
+const taskMap = new Map();
+const executeCommand = (command, input) => {
+  if(command === 'add') addTask(taskMap, input);
+  else if(command === 'update') updateStatus(taskMap, input);
+  else if(command === 'show') showTaskByStatus(taskMap, input);
 }
 
-const updateStatus = function() {
+const showCurrentTaskList = (taskMap) => {
+  const taskCountList = [0, 0, 0];
+  for(let [, value] of taskMap) {
+    taskCountList[value.status]++;
+  }
 
+  console.log(`현재상태 : todo:${taskCountList[TASK.STATUS.TODO]}개,`
+                      + ` doing:${taskCountList[TASK.STATUS.DOING]}개,` 
+                      + ` done:${taskCountList[TASK.STATUS.DONE]}개`);
 }
 
-const showTaskByStatus = function() {
+const addTask = (taskMap, input) => {
+  const [command, remark] = input.split("$");
 
+  const sequence = taskMap.size + 1;
+  const taskObj = {
+    taskId: sequence, 
+    remark: remark, 
+    status : TASK.STATUS.TODO,
+    rgstDate: new Date()
+  };
+  taskMap.set(sequence, taskObj);
+  
+  showCurrentTaskList(taskMap);
 }
 
-const executeCommand = (command) => {
+const updateStatus = (taskMap, input) => {
+  const [command, taskId, status] = input.split("$");
+  
+  if(!taskMap.has(taskId)) return;
+}
+
+const showTaskByStatus = (taskMap, input) => {
+  const [command, status] = input.split("$");
+
 }
 
 const inputCommand = () => {
-  const input = "add  $codesquad FP 과제"
-  const command = extractCommand(input);
+  const input = "aDd  $codesquad FP 과제"
+  if(input === '' && input.length === 0) return;
   
+  const command = extractCommand(input);
+  executeCommand(command, input);
 }
+
+inputCommand();
+// const aa = "aDd  $codesquad FP 과제";
+// console.log(aa.trim());
+console.log(taskMap.size);
