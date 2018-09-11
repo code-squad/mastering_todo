@@ -5,27 +5,16 @@ const pipeline = (...functions) => args => functions.reduce((arg, nextFn) => nex
 const extractValue = (regExp) => (index) => (str) => str.split(regExp)[index];
 const toLowerCase = (str) => str.toLowerCase();
 const trim = (str) => str.trim();
-const extractCommand = pipeline(
-  extractValue(TASK.SEPARATOR)(0),
-  trim,
-  toLowerCase,
-);
 
 const taskMap = new Map();
-const executeCommand = (command, input) => {
-  if(command === 'add') addTask(taskMap, input);
-  else if(command === 'update') updateStatus(taskMap, input);
-  else if(command === 'show') showTaskByStatus(taskMap, input);
-}
-
 const addTask = (taskMap, input) => {
-  const remark = input.split(TASK.SEPARATOR)[1];
+  const remark = input.split(TASK.SEPARATOR)[TASK.INDEX.REMARK];
 
   const sequence = taskMap.size + 1;
   const taskObj = {
     taskId: sequence, 
     remark: remark, 
-    status : TASK.STATUS.TODO,
+    status: TASK.STATUS.TODO,
     rgstDate: new Date()
   };
   taskMap.set(sequence, taskObj);
@@ -33,19 +22,19 @@ const addTask = (taskMap, input) => {
   showCurrentTaskList(taskMap);
 }
 
-const getTaskId = pipeline(
-  extractValue(TASK.SEPARATOR)(1),
+const matchStatus = (status) => {
+  return (status === "todo" ? TASK.STATUS.TODO : status === "doing" 
+                            ? TASK.STATUS.DOING : TASK.STATUS.DONE);
+}
+
+const getStatus = pipeline(
+  extractValue(TASK.SEPARATOR)(TASK.INDEX.STATUS.SHOW),
+  matchStatus,
   Number
 )
 
-const matchStatus = (status) => {
-  if(status === "" && status.length === 0) return;
-
-  return status === "todo" ? 0 : status === "doing" ? 1 : 2
-}
-const getStatus = pipeline(
+const getTaskId = pipeline(
   extractValue(TASK.SEPARATOR)(1),
-  matchStatus,
   Number
 )
 
@@ -65,11 +54,9 @@ const updateStatus = (taskMap, input) => {
 const showTaskByStatus = (taskMap, input) => {
   const status = getStatus(input);
   
-  let result = '';
+  let result = '상태 조회 결과가 없습니다.';
   for(let [key, value] of taskMap) {
-    if(value.status === status) {
-      result += `${value.taskId}, ${value.remark}  `;
-    }
+    if(value.status === status) result += `${value.taskId}, ${value.remark}  `;
   }
   console.log(result);
 }
@@ -85,14 +72,26 @@ const showCurrentTaskList = (taskMap) => {
                       + ` done:${taskCountList[TASK.STATUS.DONE]}개`);
 }
 
-const inputCommand = () => {
-  const input = "show  $done"
-  if(input === '' && input.length === 0) return;
-  
-  const command = extractCommand(input);
-  executeCommand(command, input);
+const extractCommand = pipeline(
+  extractValue(TASK.SEPARATOR)(TASK.INDEX.COMMAND),
+  trim,
+  toLowerCase,
+);
+
+const executeCommand = (input) => (command) => {
+  if(command === 'add') addTask(taskMap, input);
+  else if(command === 'update') updateStatus(taskMap, input);
+  else if(command === 'show') showTaskByStatus(taskMap, input);
 }
-inputCommand();
+const input = "add  $don234234e";
+const executeTodoList = pipeline(
+  extractValue(TASK.SEPARATOR)(TASK.INDEX.COMMAND),
+  trim,
+  toLowerCase,
+  executeCommand(input)
+)(input);
+  
+executeTodoList();
 
 
 
