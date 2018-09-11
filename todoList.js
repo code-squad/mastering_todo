@@ -25,12 +25,13 @@ const TASK = require('./task.js');
   */
 
 
+const SEPARATOR = "$";
 const pipeline = (...functions) => args => functions.reduce((arg, nextFn) => nextFn(arg), args);
 const splitCommand = (regExp) => (str) => str.split(regExp)[0];
 const toLowerCase = (str) => str.toLowerCase();
 const trim = (str) => str.trim();
 const extractCommand = pipeline(
-  splitCommand("$"),
+  splitCommand(SEPARATOR),
   trim,
   toLowerCase,
 );
@@ -42,19 +43,8 @@ const executeCommand = (command, input) => {
   else if(command === 'show') showTaskByStatus(taskMap, input);
 }
 
-const showCurrentTaskList = (taskMap) => {
-  const taskCountList = [0, 0, 0];
-  for(let [, value] of taskMap) {
-    taskCountList[value.status]++;
-  }
-
-  console.log(`현재상태 : todo:${taskCountList[TASK.STATUS.TODO]}개,`
-                      + ` doing:${taskCountList[TASK.STATUS.DOING]}개,` 
-                      + ` done:${taskCountList[TASK.STATUS.DONE]}개`);
-}
-
 const addTask = (taskMap, input) => {
-  const [command, remark] = input.split("$");
+  const [, remark] = input.split(SEPARATOR);
 
   const sequence = taskMap.size + 1;
   const taskObj = {
@@ -69,25 +59,50 @@ const addTask = (taskMap, input) => {
 }
 
 const updateStatus = (taskMap, input) => {
-  const [command, taskId, status] = input.split("$");
-  
+  let [, taskId, taskStatus] = input.split(SEPARATOR);
+  taskId = Number(taskId);
   if(!taskMap.has(taskId)) return;
+
+  const taskObj = taskMap.get(taskId);
+  const status = convertStatus(taskStatus);
+  const newTaskObj = Object.assign({}, taskObj, {status: status});
+  taskMap.set(taskId, newTaskObj);
+
+  showCurrentTaskList(taskMap);
+}
+
+const convertStatus = (status) => {
+  if(status === "" && status.length === 0) return;
+
+  return status === "todo" ? 0 : status === "doing" ? 1 : 2
 }
 
 const showTaskByStatus = (taskMap, input) => {
-  const [command, status] = input.split("$");
+  const [, status] = input.split(SEPARATOR);
 
 }
 
+const showCurrentTaskList = (taskMap) => {
+  const taskCountList = [0, 0, 0];
+  for(let [, value] of taskMap) {
+    taskCountList[value.status]++;
+  }
+
+  console.log(`현재상태 : todo:${taskCountList[TASK.STATUS.TODO]}개,`
+                      + ` doing:${taskCountList[TASK.STATUS.DOING]}개,` 
+                      + ` done:${taskCountList[TASK.STATUS.DONE]}개`);
+}
+
 const inputCommand = () => {
-  const input = "aDd  $codesquad FP 과제"
+  const input = "Update  $3$done"
   if(input === '' && input.length === 0) return;
   
   const command = extractCommand(input);
+  debugger;
   executeCommand(command, input);
 }
 
 inputCommand();
-// const aa = "aDd  $codesquad FP 과제";
-// console.log(aa.trim());
-console.log(taskMap.size);
+
+
+
