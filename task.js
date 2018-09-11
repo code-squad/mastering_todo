@@ -1,7 +1,8 @@
 module.exports = {
+    SEPARATOR : "$",
     STATUS: {
-        TODO : 0,
-        DOING : 1,
-        DONE : 2
+        TODO: 0,
+        DOING: 1,
+        DONE: 2
     }
 };
