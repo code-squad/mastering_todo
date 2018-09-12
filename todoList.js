@@ -2,7 +2,7 @@ const TASK = require('./task.js');
 
 const pipeline = (...functions) => args => functions.reduce((arg, nextFn) => nextFn(arg), args);
 
-const getCommand = (index) => (arr) => arr[index];
+
 const split = (regExp) => (str) => str.split(regExp);
 const toLowerCase = (str) => str.toLowerCase();
 const trim = (str) => str.trim();
@@ -17,6 +17,12 @@ const executeCommand = (commandList) => {
   else console.log('명령어를 잘못 입력하셨습니다.');
 }
 
+const command = pipeline(
+  split(TASK.SEPARATOR),
+  executeCommand
+);
+
+const getCommand = (index) => (arr) => arr[index];
 const extractCommand = pipeline(
   getCommand(TASK.INDEX.COMMAND),
   trim,
@@ -68,19 +74,19 @@ const extractTaskId = pipeline(
   Number
 );
 
-const matchStatus = (status) => {
-  if(status === "todo") return TASK.STATUS.TODO;
-  else if(status === "doing") return TASK.STATUS.DOING;
-  else if(status === "done") return TASK.STATUS.DONE;
-  else return -1;
-}
-
 const validateStatus = (status) => {
   if(!/^((todo)|(doing)|(done))$/i.test(status)) {
     console.log("입력한 상태값이 올바르지 않습니다.");
     throw new Error();
   }
   return status;
+}
+
+const matchStatus = (status) => {
+  if(status === "todo") return TASK.STATUS.TODO;
+  else if(status === "doing") return TASK.STATUS.DOING;
+  else if(status === "done") return TASK.STATUS.DONE;
+  else return -1;
 }
 
 const getTaskStatus = pipeline(
@@ -118,20 +124,10 @@ const showCurrentTaskList = (taskMap) => {
                       + ` done:${taskCountList[TASK.STATUS.DONE]}개`);
 }
 
-const command = pipeline(
-  split(TASK.SEPARATOR),
-  executeCommand
-);
-
-console.log(command);
 command('aDD   $codesquad javascript!!');
 command('aDD   $codesquad javascript!!');
 command('aDD   $codesquad javascript!!');
 command('update   $1$aasdfdoing');
-command('update   $3$done');
-command('update   $4$doing');
+command('update   $2$done');
+command('update   $3$doing');
 command('show   $doing');
-
-
-
-
