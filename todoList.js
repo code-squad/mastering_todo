@@ -2,25 +2,10 @@ const TASK = require('./task.js');
 
 const pipeline = (...functions) => args => functions.reduce((arg, nextFn) => nextFn(arg), args);
 
-const extractIndex = (index) => (arr) => arr[index];
+const getCommand = (index) => (arr) => arr[index];
 const split = (regExp) => (str) => str.split(regExp);
 const toLowerCase = (str) => str.toLowerCase();
 const trim = (str) => str.trim();
-const matchStatus = (status) => {
-  if(status === "todo") return TASK.STATUS.TODO;
-  else if(status === "doing") return TASK.STATUS.DOING;
-  else if(status === "done") return TASK.STATUS.DONE;
-  else return -1;
-}
-const validateStatus = (status) => {
-  if(status == -1) {
-    console.log("입력한 상태값이 올바르지 않습니다.");
-    throw new Error();
-  }
-  return status;
-}
-
-
 
 const taskMap = new Map();
 const executeCommand = (commandList) => {
@@ -33,7 +18,7 @@ const executeCommand = (commandList) => {
 }
 
 const extractCommand = pipeline(
-  extractIndex(TASK.INDEX.COMMAND),
+  getCommand(TASK.INDEX.COMMAND),
   trim,
   toLowerCase
 )
@@ -52,12 +37,11 @@ const addTask = (taskMap, commandList) => {
 }
 
 const updateStatus = (taskMap, commandList) => {
-  const taskId = getTaskId(commandList);
-  if(!taskMap.has(taskId)) return;
-
   try {
-    const temp = commandList[TASK.INDEX.UPDATE];
-    const status = getTaskStatus(temp);
+    const taskId = extractTaskId(commandList);
+    if(!taskMap.has(taskId)) return;
+
+    const status = getTaskStatus(commandList[TASK.INDEX.UPDATE]);
     const taskObj = taskMap.get(taskId);
     const newTaskObj = Object.assign({}, taskObj, {
       status: status, 
@@ -70,16 +54,39 @@ const updateStatus = (taskMap, commandList) => {
   }
 }
 
-const getTaskId = pipeline(
-  (args) => args[TASK.INDEX.TASKID],
+const getTaskId = (arr) => arr[TASK.INDEX.TASKID];
+const validateTaskId = (taskId) => {
+  if(!/^[0-9]+$/.test(taskId)) {
+    console.log("잘못된 일정 ID 값을 입력하였습니다.");
+    throw new Error();
+  }
+  return taskId;
+}
+const extractTaskId = pipeline(
+  getTaskId,
+  validateTaskId,
   Number
 );
 
+const matchStatus = (status) => {
+  if(status === "todo") return TASK.STATUS.TODO;
+  else if(status === "doing") return TASK.STATUS.DOING;
+  else if(status === "done") return TASK.STATUS.DONE;
+  else return -1;
+}
+
+const validateStatus = (status) => {
+  if(!/^((todo)|(doing)|(done))$/i.test(status)) {
+    console.log("입력한 상태값이 올바르지 않습니다.");
+    throw new Error();
+  }
+  return status;
+}
+
 const getTaskStatus = pipeline(
   trim,
-  toLowerCase,
-  matchStatus,
   validateStatus,
+  matchStatus,
   Number,
 );
 
@@ -89,8 +96,7 @@ const showSelectTask = (taskMap, commandList) => {
     return;
   }
   try {
-    const temp = commandList[TASK.INDEX.SHOW];
-    const status = getTaskStatus(temp);
+    const status = getTaskStatus(commandList[TASK.INDEX.SHOW]);
     let resultList = [];
     for(let [key, value] of taskMap) {
       if(value.status === status)
@@ -119,16 +125,13 @@ const command = pipeline(
 
 console.log(command);
 command('aDD   $codesquad javascript!!');
-command('aDD   $test1!!');
-command('aDD   $할일...');
-command('aDD   $놀기!!');
-command('aDD   $ㅁㄴㅇㄻㄴㅇㄻㄴㅇㄹ javascript!!');
-command('aDD   $codesquad jaㅁㄴㅇㄻㄴㅇㄹ!!');
-command('show   $todo');
-
-command('update   $3$doing');
+command('aDD   $codesquad javascript!!');
+command('aDD   $codesquad javascript!!');
+command('update   $1$aasdfdoing');
+command('update   $3$done');
 command('update   $4$doing');
-command('update   $5$doing');
+command('show   $doing');
+
 
 
 
