@@ -20,23 +20,22 @@ const strUtils = {
     strToLower : (str) => str.toLowerCase(), //2
     strSplit : (str) => str.split("$"), //3
 }
-
-function addTask(strComm){
+function getStatus(status){
+    let result = 0
+    if(status.indexOf("doing") != -1) result = 1
+    else if(status.indexOf("done") != -1) result = 2
+    return result
+}
+function genWorkObj(strComm){
     let workObj = {
         id: workList.length+1,
         status: getStatus(strComm[0]), //0> todo, 1>doing, 2>done
         workContents: strComm[1]
     }
-    workList.push(workObj)
-    printAddTask(workObj)
-    printCurrentStatus()
+    workList.push(workObj);
+    return workObj;
 }
-
-function showTask(strComm){
-    printShowTask(selectedTask(strComm))
-}
-
-function selectedTask(strComm){
+function getSelectedStatusTaskList(strComm){
     const status = getStatus(strComm[1])
     return workList.reduce(function (accumulator, currentValue, currentIdx, array){
         if(currentValue.status !== status){
@@ -45,15 +44,7 @@ function selectedTask(strComm){
         return array;
       },0);
 }
-
-function getStatus(status){
-    let result = 0
-    if(status.indexOf("doing") != -1) result = 1
-    else if(status.indexOf("done") != -1) result = 2
-    return result
-}
-
-function currentWorkListStatus(){
+function getCurrentWorkListStatus(){
     return workList.map(function(work){
         let workListStatus = [0, 0, 0]
         workListStatus[work.status]++
@@ -61,8 +52,19 @@ function currentWorkListStatus(){
     })   
 }
 
-function command(str){
+function updateTask(strComm){
+    workList.forEach(work => {
+        if(work.id == strComm[1]){
+            work.status = getStatus(strComm[2]) 
+        } 
+    })  
+    printCurrentStatus()
+}
 
+var addTask = (strComm) => printAddTask(genWorkObj(strComm))
+var showTask = (strComm) => printShowTaskStatus(getSelectedStatusTaskList(strComm))
+
+function command(str){
     let strComm = strUtils.strSplit(strUtils.strToLower(strUtils.strTrim(str)))
    
     if(strComm[0] === "add") addTask(strComm)
@@ -72,17 +74,18 @@ function command(str){
 
 }
 
-function printAddTask(workObj, printCurrentStatus){
-    console.log("id: " + workObj.id + ", " + workObj.workContents + "항목이 새로 추가됐습니다.")  
+
+function printAddTask(workObj){
+    console.log("id: " + workObj.id + ", " + workObj.workContents + " 항목이 새로 추가됐습니다.")  
+    printCurrentStatus()
 }
 
-
 function printCurrentStatus(){
-    var currentStatus = currentWorkListStatus()
+    var currentStatus = getCurrentWorkListStatus()
     return console.log("현재상태 : todo: " + currentStatus[0][0] + "개, doing: " + currentStatus[0][1] + "개, done: " + currentStatus[0][2] +"개");
 }
 
-function printShowTask(selectedTaskList){
+function printShowTaskStatus(selectedTaskList){
     if(selectedTaskList.length === 0){
         console.log("없음")
     }else{
@@ -93,3 +96,4 @@ function printShowTask(selectedTaskList){
 
 command("Add $ test")
 command(" SHOW $ toDo")
+command("update $1$ doing")
