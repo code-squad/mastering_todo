@@ -14,17 +14,17 @@
 
 let workList = []
 
-var strToTrim = (str) => str.replace(/ /gi, "")
-var strToLower = (fn) => fn.toLowerCase()
-var strToSplit = (fn) => fn.split("$")
+const strToTrim = (str) => str.replace(/ /gi, "")
+const strToLower = (fn) => fn.toLowerCase()
+const strToSplit = (fn) => fn.split("$")
 
 // function strUtil(fn1, fn2, fn3){
 //     return function(str){
 //         return fn1(fn2(fn3(str)))
 //     }
 // }
-var strUtil = (fn1, fn2, fn3) => (str) => fn1(fn2(fn3(str)))
-var commandParse = strUtil(strToSplit, strToLower, strToTrim)
+const strUtil = (fn1, fn2, fn3) => (str) => fn1(fn2(fn3(str)))
+const commandParse = strUtil(strToSplit, strToLower, strToTrim)
 
 function getStatus(status){
     let result = 0
@@ -67,8 +67,8 @@ function updateTask(strComm){
     printCurrentStatus()
 }
 
-var addTask = (strComm) => printAddTask(genWorkObj(strComm))
-var showTask = (strComm) => printShowTaskStatus(getSelectedStatusTaskList(strComm))
+const addTask = (strComm) => printAddTask(genWorkObj(strComm))
+const showTask = (strComm) => printShowTaskStatus(getSelectedStatusTaskList(strComm))
 
 function command(str){
     let strComm = commandParse(str)
