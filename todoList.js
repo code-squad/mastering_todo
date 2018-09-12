@@ -2,7 +2,8 @@ const TASK = require('./task.js');
 
 const pipeline = (...functions) => args => functions.reduce((arg, nextFn) => nextFn(arg), args);
 
-const extractValue = (regExp) => (index) => (str) => str.split(regExp)[index];
+const extractIndex = (index) => (arr) => arr[index];
+const split = (regExp) => (str) => str.split(regExp);
 const toLowerCase = (str) => str.toLowerCase();
 const trim = (str) => str.trim();
 const matchStatus = (status) => {
@@ -19,8 +20,58 @@ const validateStatus = (status) => {
   return status;
 }
 
+
+
+const taskMap = new Map();
+const executeCommand = (commandList) => {
+  const command = extractCommand(commandList);
+  
+  if(command === 'add') addTask(taskMap, commandList);
+  else if(command === 'update') updateStatus(taskMap, commandList);
+  else if(command === 'show') showSelectTask(taskMap, commandList);
+  else console.log('명령어를 잘못 입력하셨습니다.');
+}
+
+const extractCommand = pipeline(
+  extractIndex(TASK.INDEX.COMMAND),
+  trim,
+  toLowerCase
+)
+
+const addTask = (taskMap, commandList) => {
+  const sequence = taskMap.size + 1;
+  const taskObj = {
+    taskId: sequence, 
+    remark: commandList[TASK.INDEX.REMARK], 
+    status: TASK.STATUS.TODO,
+    rgstDate: new Date()
+  };
+  taskMap.set(sequence, taskObj);
+  
+  showCurrentTaskList(taskMap);
+}
+
+const updateStatus = (taskMap, commandList) => {
+  const taskId = getTaskId(commandList);
+  if(!taskMap.has(taskId)) return;
+
+  try {
+    const temp = commandList[TASK.INDEX.UPDATE];
+    const status = getTaskStatus(temp);
+    const taskObj = taskMap.get(taskId);
+    const newTaskObj = Object.assign({}, taskObj, {
+      status: status, 
+      updtDate: new Date()
+    });
+    taskMap.set(taskId, newTaskObj);
+  
+    showCurrentTaskList(taskMap);
+  } catch (error) {
+  }
+}
+
 const getTaskId = pipeline(
-  extractValue(TASK.SEPARATOR)(TASK.INDEX.TASKID),
+  (args) => args[TASK.INDEX.TASKID],
   Number
 );
 
@@ -32,46 +83,14 @@ const getTaskStatus = pipeline(
   Number,
 );
 
-const taskMap = new Map();
-const addTask = (taskMap, input) => {
-  const remark = extractValue(TASK.SEPARATOR)(TASK.INDEX.REMARK)(input);
-
-  const sequence = taskMap.size + 1;
-  const taskObj = {
-    taskId: sequence, 
-    remark: remark, 
-    status: TASK.STATUS.TODO,
-    rgstDate: new Date()
-  };
-  taskMap.set(sequence, taskObj);
-  
-  showCurrentTaskList(taskMap);
-}
-
-const updateStatus = (taskMap, input) => {
-  const taskId = getTaskId(input);
-  if(!taskMap.has(taskId)) return;
-
-  try {
-    const tempStatus = extractValue(TASK.SEPARATOR)(TASK.INDEX.UPDATE)(input);
-    const status = getTaskStatus(tempStatus);
-    const taskObj = taskMap.get(taskId);
-    const newTaskObj = Object.assign({}, taskObj, {status: status, updtDate: new Date()});
-    taskMap.set(taskId, newTaskObj);
-  
-    showCurrentTaskList(taskMap);
-  } catch (error) {
-  }
-}
-
-const showSelectTask = (taskMap, input) => {
+const showSelectTask = (taskMap, commandList) => {
   if(taskMap.size === 0) {
     console.log("상태 조회 결과가 없습니다.");
     return;
   }
   try {
-    const tempStatus = extractValue(TASK.SEPARATOR)(TASK.INDEX.SHOW)(input);
-    const status = getTaskStatus(tempStatus);
+    const temp = commandList[TASK.INDEX.SHOW];
+    const status = getTaskStatus(temp);
     let resultList = [];
     for(let [key, value] of taskMap) {
       if(value.status === status)
@@ -93,22 +112,23 @@ const showCurrentTaskList = (taskMap) => {
                       + ` done:${taskCountList[TASK.STATUS.DONE]}개`);
 }
 
-const executeCommand = (command) => {
-  if(command === 'add') addTask(taskMap, input);
-  else if(command === 'update') updateStatus(taskMap, input);
-  else if(command === 'show') showSelectTask(taskMap, input);
-  else console.log('명령어를 잘못 입력하셨습니다.');
-}
-
-const input = 'ADD  $codesquad javascript!!';
-const startTodoList = pipeline(
-  extractValue(TASK.SEPARATOR)(TASK.INDEX.COMMAND),
-  trim,
-  toLowerCase,
+const command = pipeline(
+  split(TASK.SEPARATOR),
   executeCommand
 );
 
-startTodoList(input);
+console.log(command);
+command('aDD   $codesquad javascript!!');
+command('aDD   $test1!!');
+command('aDD   $할일...');
+command('aDD   $놀기!!');
+command('aDD   $ㅁㄴㅇㄻㄴㅇㄻㄴㅇㄹ javascript!!');
+command('aDD   $codesquad jaㅁㄴㅇㄻㄴㅇㄹ!!');
+command('show   $todo');
+
+command('update   $3$doing');
+command('update   $4$doing');
+command('update   $5$doing');
 
 
 
