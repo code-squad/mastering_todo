@@ -14,12 +14,18 @@
 
 let workList = []
 
-const strUtils = {
-    str : "Add$ 테스트 ",
-    strTrim : (str) => str.replace(/ /gi, ""), // 모든 공백을 제거, //1
-    strToLower : (str) => str.toLowerCase(), //2
-    strSplit : (str) => str.split("$"), //3
-}
+var strToTrim = (str) => str.replace(/ /gi, "")
+var strToLower = (fn) => fn.toLowerCase()
+var strToSplit = (fn) => fn.split("$")
+
+// function strUtil(fn1, fn2, fn3){
+//     return function(str){
+//         return fn1(fn2(fn3(str)))
+//     }
+// }
+var strUtil = (fn1, fn2, fn3) => (str) => fn1(fn2(fn3(str)))
+var commandParse = strUtil(strToSplit, strToLower, strToTrim)
+
 function getStatus(status){
     let result = 0
     if(status.indexOf("doing") != -1) result = 1
@@ -65,7 +71,7 @@ var addTask = (strComm) => printAddTask(genWorkObj(strComm))
 var showTask = (strComm) => printShowTaskStatus(getSelectedStatusTaskList(strComm))
 
 function command(str){
-    let strComm = strUtils.strSplit(strUtils.strToLower(strUtils.strTrim(str)))
+    let strComm = commandParse(str)
    
     if(strComm[0] === "add") addTask(strComm)
     else if(strComm[0] === "update") updateTask(strComm)
@@ -73,7 +79,6 @@ function command(str){
    // else showErroMsg();
 
 }
-
 
 function printAddTask(workObj){
     console.log("id: " + workObj.id + ", " + workObj.workContents + " 항목이 새로 추가됐습니다.")  
