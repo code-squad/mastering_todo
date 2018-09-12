@@ -43,12 +43,9 @@ function genWorkObj(strComm){
 }
 function getSelectedStatusTaskList(strComm){
     const status = getStatus(strComm[1])
-    return workList.reduce(function (accumulator, currentValue, currentIdx, array){
-        if(currentValue.status !== status){
-            array.pop(currentValue)
-        }
-        return array;
-      },0);
+    return workList.filter(function(work){
+        return work.status == status
+    })
 }
 function getCurrentWorkListStatus(){
     return workList.map(function(work){
@@ -100,5 +97,6 @@ function printShowTaskStatus(selectedTaskList){
 }
 
 command("Add $ test")
-command(" SHOW $ toDo")
+command(" SHOW $ Doing")
+console.log(workList)
 command("update $1$ doing")
