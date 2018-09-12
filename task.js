@@ -4,10 +4,8 @@ module.exports = {
         COMMAND: 0,
         TASKID: 1,
         REMARK: 1,
-        STATUS: {
-            SHOW: 1,
-            UPDATE: 2 
-        }
+        SHOW: 1,
+        UPDATE: 2,
     },
     STATUS: {
         TODO: 0,
