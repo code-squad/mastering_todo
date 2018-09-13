@@ -89,11 +89,11 @@ function printCurrentStatus(){
 }
 
 function printShowTaskStatus(selectedTaskList){
-    if(selectedTaskList.length === 0) return
+    if(selectedTaskList.length === 0) return console.log("없음")
     for(let selectedTask of selectedTaskList)
         console.log("\'"+ selectedTask.id + ", " + selectedTask.workContents + "\'")
 }
 
 command("Add $ test")
-command(" SHOW $ todo")
+command(" SHOW $ doing")
 command("update $1$ doing")
