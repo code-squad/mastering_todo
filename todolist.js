@@ -19,16 +19,30 @@ const data = {
   currendId: 0,
 }
 
-const command = (string) => {
+/**
+ *  문자열을 $를 기준으로 분리하는 함수
+ *  @param {String} input - 입력값
+ */
+const command = (input) => {
   
 }
 
-const split = () => {
-  
-}
+/**
+ *  문자열을 $를 기준으로 분리하는 함수
+ *  @param {String} text - 문자열
+ */
+const split = text => text.split("$");
 
-const trim = () => {
-  
+/**
+ *  문자의 공백을 제거하는 함수 
+ *  @param {String} textArray - 공백을 제거할 텍스트 배열
+ */
+const trim = (textArray) => {
+  const trimmedInput = [];
+  textArray.forEach((item) => {
+    trimmedInput.push(item.trim());
+  });
+  return trimmedInput;
 }
 
 const toLowerCase = () => {
