@@ -15,39 +15,37 @@
  *  - code 형태는 function으로 개발하고, 함수형의 특징을 많이 살리도록 노력한다.
  */
 const data = {
+  separator: '$',
   todos: [],
   currendId: 0,
 }
 
-/**
- *  문자열을 $를 기준으로 분리하는 함수
- *  @param {String} input - 입력값
- */
-const command = (input) => {
-  
+const pipe = (...functions) => args => functions.reduce((arg, nextFn) => nextFn(arg), args);
+
+const split = text => text.split(data.separator);
+const trim = text => text.trim();
+const toLowerCase = text => text.toLowerCase();
+
+const arrangeCommand = array => {
+  const newArray = [];
+  array.forEach(item => {
+    newArray.push(arrangeText(item));
+  })
+  return newArray;
 }
 
-/**
- *  문자열을 $를 기준으로 분리하는 함수
- *  @param {String} text - 문자열
- */
-const split = text => text.split("$");
+const command = pipe(
+  split,
+  arrangeCommand
+)
 
-/**
- *  문자의 공백을 제거하는 함수 
- *  @param {String} textArray - 공백을 제거할 텍스트 배열
- */
-const trim = (textArray) => {
-  const trimmedInput = [];
-  textArray.forEach((item) => {
-    trimmedInput.push(item.trim());
-  });
-  return trimmedInput;
-}
+const arrangeText = pipe(
+  trim,
+  toLowerCase
+)
 
-const toLowerCase = () => {
-  
-}
+console.log('command("Add $ task  "):', command("Add $ task  "));
+
 
 const add = () => {
   
