@@ -27,16 +27,43 @@ const trim = text => text.trim();
 const toLowerCase = text => text.toLowerCase();
 
 const arrangeCommand = array => {
-  const newArray = [];
-  array.forEach(item => {
-    newArray.push(arrangeText(item));
-  })
-  return newArray;
+  return array.map((item) => {
+    return arrangeText(item);
+  });
+}
+
+const add = (array) => {
+  console.log('add');
+  console.log('array:', array);
+}
+
+const show = (array) => {
+  console.log('show');
+  console.log('array:', array);
+}
+
+const update = (array) => {
+  console.log('update');
+  console.log('array:', array);
+}
+
+
+const runCommand = array => {
+  if (array.includes('add')) {
+    add(array);
+  } else if (array.includes('show')) {
+    show(array);
+  } else if (array.includes('update')) {
+    update(array);
+  } else {
+    console.log('유효한 명령을 입력하세요.');
+  }
 }
 
 const command = pipe(
   split,
-  arrangeCommand
+  arrangeCommand,
+  runCommand,
 )
 
 const arrangeText = pipe(
@@ -45,16 +72,5 @@ const arrangeText = pipe(
 )
 
 console.log('command("Add $ task  "):', command("Add $ task  "));
-
-
-const add = () => {
-  
-}
-
-const show = () => {
-  
-}
-
-const update = () => {
-  
-}
+console.log('command("update $ task  "):', command("update $ task  "));
+console.log('command("show $ Task  "):', command("show $ Task  "));
