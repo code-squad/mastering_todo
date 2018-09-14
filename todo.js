@@ -1,5 +1,5 @@
-// 할일을 추가할 수 있다.  =>  add()
-// 할일이 추가되면 id 값을 생성하고 결과를 알려준다.
+// 할일을 추가할 수 있다.  =>  add() ok
+// 할일이 추가되면 id 값을 생성하고 결과를 알려준다. ok
 // 상태는 3가지로 관리된다. todo, doing, done.
 // 각 일(task)는 상태값을 가지고 있고, 그 상태값을 변경할 수 있다.
 // 각 상태에 있는 task는 show함수를 통해서 볼 수 있다. -> show()
@@ -44,14 +44,15 @@ const TODO = {
     { id: 7, taskTitle: 'mongoDB 공부', status: 'todo', time: 0 } //startTime, endTime해줄까...?
   ]
 }
-const command = orderSentence => {
-  const [order, firstSentence] = orderSentence.split('$')
-  if (order === 'add') add((taskTitle = firstSentence))
-  if (order === 'show') show((status = firstSentence))
+function command (orderSentence) {
+  const [firstWord, secondWord ] = refineSentence(orderSentence)
+  if (firstWord === 'add') add((taskTitle = secondWord))
+  if (firstWord === 'show') show((status = secondWord))
 }
 
-const add = taskTitle => {
-  console.log('taskTitle', taskTitle)
+const refineSentence = sentence => sentence.toLowerCase().split('$').map(word => word.trim())
+
+function add(taskTitle) {
   const newTask = { id: TODO.tasks.length + 1, taskTitle, status: 'todo' }
   setTask(newTask)
   increaseStatus(newTask.status)
@@ -80,20 +81,18 @@ const logPresentStatus = ({ todo, doing, done }) => {
   console.log(`> 현재상태 :  todo:${todo}개, doing:${doing}개, done:${done}개`)
 }
 
-const show = statusType => getTypeTask(statusType).forEach(task => logTask(task))
+function show(statusType) {
+  getTypeTask(statusType).forEach(task => logTask(task))
+}
 
-const getTypeTask = statusType => TODO.tasks.filter(task => task.status === statusType)
-
+const getTypeTask = statusType =>
+  TODO.tasks.filter(task => task.status === statusType)
 const logTask = ({ id, taskTitle }) => console.log(`> "${id}, ${taskTitle}"`)
-
-
-
-
 
 // command('add$자바스크립트 공부하기')
 // > id: 5,  "자바스크립트 공부하기" 항목이 새로 추가됐습니다.  //추가된 결과 메시지를 출력
 // > 현재상태 :  todo:1개, doing:2개, done:2개
 
-command('show$doing')
-// command("shOW     $doing");   //공백도 제거되고, 대문자가 섞여있어도 잘 동작되게 한다.
+// command('show$doing')
+command('shOW     $doing') //공백도 제거되고, 대문자가 섞여있어도 잘 동작되게 한다.
 // > "1, 그래픽스공부", "4, 블로그쓰기"  //id값과 함께 task제목이 출력된다.
