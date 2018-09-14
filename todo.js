@@ -34,17 +34,25 @@ const TODO = {
     doing: 0,
     done: 0
   },
-  task: [
-    { id: 1, taskTitle: '자바스크립트', status: 'todo', time: 0 } //startTime, endTime해줄까...?
+  tasks: [
+    { id: 1, taskTitle: '자바스크립트 공부', status: 'doing', time: 0 },
+    { id: 2, taskTitle: '자바 공부', status: 'todo', time: 0 },
+    { id: 3, taskTitle: 'C 공부', status: 'todo', time: 0 },
+    { id: 4, taskTitle: 'python 공부', status: 'todo', time: 0 },
+    { id: 5, taskTitle: '리액트 공부', status: 'doing', time: 0 },
+    { id: 6, taskTitle: 'Vue 공부', status: 'done', time: 0 },
+    { id: 7, taskTitle: 'mongoDB 공부', status: 'todo', time: 0 } //startTime, endTime해줄까...?
   ]
 }
 const command = orderSentence => {
-  const [order, taskTitle] = orderSentence.split('$')
-  if (order === 'add') add({ taskTitle })
+  const [order, firstSentence] = orderSentence.split('$')
+  if (order === 'add') add((taskTitle = firstSentence))
+  if (order === 'show') show((status = firstSentence))
 }
 
-const add = ({ taskTitle }) => {
-  const newTask = { id: TODO.task.length + 1, taskTitle, status: 'todo' }
+const add = taskTitle => {
+  console.log('taskTitle', taskTitle)
+  const newTask = { id: TODO.tasks.length + 1, taskTitle, status: 'todo' }
   setTask(newTask)
   increaseStatus(newTask.status)
   logAddResult(newTask)
@@ -52,8 +60,8 @@ const add = ({ taskTitle }) => {
 }
 
 const setTask = newTask => {
-  const prevTasks = TODO.task
-  TODO.task = [...prevTasks, newTask]
+  const prevTasks = TODO.tasks
+  TODO.tasks = [...prevTasks, newTask]
 }
 
 const increaseStatus = statusType => {
@@ -72,8 +80,20 @@ const logPresentStatus = ({ todo, doing, done }) => {
   console.log(`> 현재상태 :  todo:${todo}개, doing:${doing}개, done:${done}개`)
 }
 
-const show = () => {}
+const show = statusType => getTypeTask(statusType).forEach(task => logTask(task))
 
-command('add$자바스크립트 공부하기')
+const getTypeTask = statusType => TODO.tasks.filter(task => task.status === statusType)
+
+const logTask = ({ id, taskTitle }) => console.log(`> "${id}, ${taskTitle}"`)
+
+
+
+
+
+// command('add$자바스크립트 공부하기')
 // > id: 5,  "자바스크립트 공부하기" 항목이 새로 추가됐습니다.  //추가된 결과 메시지를 출력
 // > 현재상태 :  todo:1개, doing:2개, done:2개
+
+command('show$doing')
+// command("shOW     $doing");   //공백도 제거되고, 대문자가 섞여있어도 잘 동작되게 한다.
+// > "1, 그래픽스공부", "4, 블로그쓰기"  //id값과 함께 task제목이 출력된다.
