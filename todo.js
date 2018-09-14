@@ -22,17 +22,24 @@
 
 // command("show$done"); ->
 // > '1, iOS공부하기, 3시간10분',  '5, 자바스크립트공부하기, 9시간31분',  '7, 주간회의 1시간40분'  // task가 doing이 될 때가 시작시간이고, task가 done이 되면 끝나는 시간이다.
+const STATUS = {
+  TODO: 'todo',
+  DOING: 'doing',
+  DONE: 'done'
+}
 
 const TODO = {
-  // state : {
-
-  // },
+  totalStatus: {
+    todo: 0,
+    doing: 0,
+    done: 0
+  },
   task: [
     { id: 1, taskTitle: '자바스크립트', status: 'todo', time: 0 } //startTime, endTime해줄까...?
   ]
 }
 const command = orderSentence => {
-  // $을 기준으로 쪼개기. 첫번째가 명령어!
+  // $을 기준으로 쪼개기. 첫번째가 명령어! -> 리팩토링 하기
   const splitedOrder = orderSentence.split('$')
   const order = splitedOrder[0]
   const taskTitle = splitedOrder[1]
@@ -43,24 +50,36 @@ const command = orderSentence => {
 }
 
 const add = ({ taskTitle }) => {
-  const newTask = {id: TODO.task.length + 1, taskTitle, status: 'doing'}
+  const newTask = { id: TODO.task.length + 1, taskTitle, status: 'todo' }
   setTask(newTask)
-  addLog(newTask)
+  increaseStatus(newTask.status)
+  logAddResult(newTask)
+  logPresentStatus(TODO.totalStatus)
 }
 
-setTask = newTask => {
+const setTask = newTask => {
   const prevTasks = TODO.task
-  TODO.task = [ ...prevTasks, newTask ]
+  TODO.task = [...prevTasks, newTask]
 }
 
-addLog = ({id, taskTitle}) => {
+const increaseStatus = statusType => {
+  const prevStatus = TODO.totalStatus
+  switch (statusType) {
+    case STATUS.TODO:
+      TODO.totalStatus = { ...prevStatus, todo: prevStatus.todo + 1 }
+  }
+}
+
+const logAddResult = ({ id, taskTitle }) => {
   console.log(`> id: ${id}, "${taskTitle}" 항목이 새로 추가됐습니다.`)
+}
+
+const logPresentStatus = ({todo, doing, done}) => {
+  console.log(`> 현재상태 :  todo:${todo}개, doing:${doing}개, done:${done}개`)
 }
 
 const show = () => {}
 
 command('add$자바스크립트 공부하기')
-command('add$파이썬 공부하기')
-command('add$리액트 공부하기')
 // > id: 5,  "자바스크립트 공부하기" 항목이 새로 추가됐습니다.  //추가된 결과 메시지를 출력
 // > 현재상태 :  todo:1개, doing:2개, done:2개
