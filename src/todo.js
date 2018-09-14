@@ -9,7 +9,7 @@ const getHHMM = () => {
 const todo = (function() {
   const tasks = [];
 
-  const printTodo = function() {
+  const consoleTodo = function() {
     const { todo = 0, doing = 0, done = 0 } = tasks.reduce((obj, { state }) => {
       obj[state] = obj[state] || 0;
       obj[state]++;
@@ -30,7 +30,7 @@ const todo = (function() {
         content: content.trim(),
         state: 'todo',
       });
-      printTodo();
+      consoleTodo();
     };
   })();
 
@@ -47,17 +47,25 @@ const todo = (function() {
     return tasks.filter(stateType).reduce(showLog, '');
   };
 
+  const changeState = (beforeState, afterState) => {
+    // TODO: add start time && remove end time
+    if (beforeState !== 'doing' && afterState === 'doing') return;
+    // TODO: add start time && add start end time
+    if (beforeState === 'doing' && afterState === 'done') return;
+  };
+
   // TODO: 상태가 doing으로 변경될때 시간 기억
   const update = (() => {
     return (args) => {
       const [index, state] = args;
+      const isFindTaskByIndex = ({ id }) => id === Number(index);
 
       tasks.find((task) => {
-        if (task.id === Number(index)) {
+        if (isFindTaskByIndex(task)) {
           task.state = state;
         }
       });
-      printTodo();
+      consoleTodo();
     };
   })();
 
