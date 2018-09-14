@@ -39,14 +39,8 @@ const TODO = {
   ]
 }
 const command = orderSentence => {
-  // $을 기준으로 쪼개기. 첫번째가 명령어! -> 리팩토링 하기
-  const splitedOrder = orderSentence.split('$')
-  const order = splitedOrder[0]
-  const taskTitle = splitedOrder[1]
-
-  if (order === 'add') {
-    add({ taskTitle })
-  }
+  const [order, taskTitle] = orderSentence.split('$')
+  if (order === 'add') add({ taskTitle })
 }
 
 const add = ({ taskTitle }) => {
@@ -74,7 +68,7 @@ const logAddResult = ({ id, taskTitle }) => {
   console.log(`> id: ${id}, "${taskTitle}" 항목이 새로 추가됐습니다.`)
 }
 
-const logPresentStatus = ({todo, doing, done}) => {
+const logPresentStatus = ({ todo, doing, done }) => {
   console.log(`> 현재상태 :  todo:${todo}개, doing:${doing}개, done:${done}개`)
 }
 
