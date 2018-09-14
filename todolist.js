@@ -17,7 +17,7 @@
 const data = {
   separator: '$',
   todos: [],
-  currendId: 0,
+  currentId: 0,
 }
 
 const pipe = (...functions) => args => functions.reduce((arg, nextFn) => nextFn(arg), args);
@@ -33,8 +33,19 @@ const arrangeCommand = array => {
 }
 
 const add = (array) => {
-  console.log('add');
-  console.log('array:', array);
+  const newTodos = [
+    ...data.todos,
+    {
+      id: data.currentId,
+      status: 'todo',
+      todo: array[1],
+      startAt: null,
+      endAt: null,
+    }
+  ];
+  data.todos = newTodos;
+  data.currentId++;
+  console.log('data.todos:', data.todos);
 }
 
 const show = (array) => {
@@ -72,5 +83,6 @@ const arrangeText = pipe(
 )
 
 console.log('command("Add $ task  "):', command("Add $ task  "));
+console.log('command("Add $ something  "):', command("Add $ something  "));
 console.log('command("update $ task  "):', command("update $ task  "));
-console.log('command("show $ Task  "):', command("show $ Task  "));
+console.log('command("show $ todo  "):', command("show $ todo  "));
