@@ -27,19 +27,22 @@ const split = text => text.split(data.separator);
 const trim = text => text.trim();
 const toLowerCase = text => text.toLowerCase();
 
+// 명령어 text의 공백, 소문자 등을 정라히는 함수
 const arrangeCommand = array => {
   return array.map((item) => {
     return arrangeText(item);
   });
 }
 
+// todolist의 todo를 추가하는 함수 
+// 추가된 항목을 출력하고, 현재 상태를 출력
 const add = (array) => {
   const newTodos = [
     ...data.todos,
     {
       id: data.currentId,
       status: 'todo',
-      todo: array[1],
+      task: array[1],
       startAt: null,
       endAt: null,
     }
@@ -50,20 +53,31 @@ const add = (array) => {
   data.currentId++;
 }
 
+// 출력을 원하는 상태의 id와 task를 출력하는 함수 
 const show = (array) => {
   const todos = data.todos.reduce((accumulator, value) => {
     if (value.status === array[1]) {
-      accumulator.push(`'${value.id}, ${value.todo}'`);
+      accumulator.push(`'${value.id}, ${value.task}'`);
     }
     return accumulator;
   }, []);
   console.log(todos.join(", "));
 }
 
+// task의 상태를 업데이트하는 함수
+// doing의 경우 시작 시간 추가 
+// done의 경우 끝난 시간 추가 
 const update = (array) => {
-  console.log('update');
+  const index = data.todos.findIndex(item => item.id === Number(array[1]));
+  if (index >= 0) {
+    data.todos[index].status = array[2];
+  } else {
+    console.log('유효한 명령을 입력해주세요.');
+  }
+  printCurrentStatus();
 }
 
+// todolist의 현재상태를 출력하는 함수 
 const printCurrentStatus = () => {
   const currentStatus = [];
   data.status.forEach((status) => {
@@ -73,6 +87,7 @@ const printCurrentStatus = () => {
   console.log('현재상태 :', currentStatus.join(", "));
 }
 
+// 입력된 command의 싱태를 실행하는 함수 
 const runCommand = array => {
   if (array.includes('add')) {
     add(array);
