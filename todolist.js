@@ -18,6 +18,7 @@ const data = {
   separator: '$',
   todos: [],
   currentId: 0,
+  status: ['todo', 'doing', 'done']
 }
 
 const pipe = (...functions) => args => functions.reduce((arg, nextFn) => nextFn(arg), args);
@@ -44,20 +45,33 @@ const add = (array) => {
     }
   ];
   data.todos = newTodos;
+  console.log(`id: ${data.currentId}, "${array[1]}" 항목이 추가되었습니다.`);
+  printCurrentStatus();
   data.currentId++;
-  console.log('data.todos:', data.todos);
 }
 
 const show = (array) => {
-  console.log('show');
-  console.log('array:', array);
+  const todos = data.todos.reduce((accumulator, value) => {
+    if (value.status === array[1]) {
+      accumulator.push(`'${value.id}, ${value.todo}'`);
+    }
+    return accumulator;
+  }, []);
+  console.log(todos.join(", "));
 }
 
 const update = (array) => {
   console.log('update');
-  console.log('array:', array);
 }
 
+const printCurrentStatus = () => {
+  const currentStatus = [];
+  data.status.forEach((status) => {
+    const task = data.todos.filter(item => item.status === status);
+    currentStatus.push(`${status}: ${task.length}개`);
+  })
+  console.log('현재상태 :', currentStatus.join(", "));
+}
 
 const runCommand = array => {
   if (array.includes('add')) {
@@ -82,7 +96,8 @@ const arrangeText = pipe(
   toLowerCase
 )
 
-console.log('command("Add $ task  "):', command("Add $ task  "));
-console.log('command("Add $ something  "):', command("Add $ something  "));
-console.log('command("update $ task  "):', command("update $ task  "));
-console.log('command("show $ todo  "):', command("show $ todo  "));
+command("add$자바스크립트 공부하기");
+command("shOW     $todo");
+command("shOW     $doing");
+command("update$0$done");
+command("show$done");
