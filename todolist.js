@@ -14,6 +14,7 @@
  *  - 유효하지 않은 입력은 오류를 발생시킨다.
  *  - code 형태는 function으로 개발하고, 함수형의 특징을 많이 살리도록 노력한다.
  */
+
 const data = {
   separator: '$',
   todos: [],
@@ -22,7 +23,6 @@ const data = {
 }
 
 const pipe = (...functions) => args => functions.reduce((arg, nextFn) => nextFn(arg), args);
-
 const split = text => text.split(data.separator);
 const trim = text => text.trim();
 const toLowerCase = text => text.toLowerCase();
@@ -67,12 +67,20 @@ const add = (array) => {
   data.currentId++;
 }
 
+const calcTime = (todo) => {
+  const differenceHour = todo.endAt.getHours() - todo.startAt.getHours();
+  const differenceMinutes = todo.endAt.getMinutes() - todo.startAt.getMinutes();
+  return `${differenceHour}시간 ${differenceMinutes}분`
+}
+
 // 출력을 원하는 상태의 id와 task를 출력하는 함수
 const show = (array) => {
   const [type, status] = array;
   const todos = data.todos.reduce((accumulator, value) => {
-    if (value.status === status) {
+    if (status !== 'done' && value.status === status) {
       accumulator.push(`'${value.id}, ${value.task}'`);
+    } else if (status === 'done' && value.status === status) {
+      accumulator.push(`'${value.id}, ${value.task}', ${calcTime(value)}`);
     }
     return accumulator;
   }, []);
@@ -91,6 +99,11 @@ const update = (array) => {
   const index = data.todos.findIndex(item => item.id === Number(id));
   if (index >= 0) {
     data.todos[index].status = status;
+    if (status === 'doing') {
+      data.todos[index].startAt = new Date();
+    } else if (status === 'done') {
+      data.todos[index].endAt = new Date();
+    }
   } else {
     console.log('유효한 명령을 입력해주세요.');
   }
@@ -120,6 +133,7 @@ const arrangeText = pipe(
 
 command("add$자바스크립트 공부하기");
 command("shOW     $todo");
+command("update$0$doing");
 command("shOW     $doing");
 command("update$0$done");
 command("show$done");
