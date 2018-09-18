@@ -34,60 +34,7 @@ const arrangeCommand = array => {
   });
 }
 
-// todolist의 todo를 추가하는 함수 
-// 추가된 항목을 출력하고, 현재 상태를 출력
-const add = (array) => {
-  const newTodos = [
-    ...data.todos,
-    {
-      id: data.currentId,
-      status: 'todo',
-      task: array[1],
-      startAt: null,
-      endAt: null,
-    }
-  ];
-  data.todos = newTodos;
-  console.log(`id: ${data.currentId}, "${array[1]}" 항목이 추가되었습니다.`);
-  printCurrentStatus();
-  data.currentId++;
-}
-
-// 출력을 원하는 상태의 id와 task를 출력하는 함수 
-const show = (array) => {
-  const todos = data.todos.reduce((accumulator, value) => {
-    if (value.status === array[1]) {
-      accumulator.push(`'${value.id}, ${value.task}'`);
-    }
-    return accumulator;
-  }, []);
-  console.log(todos.join(", "));
-}
-
-// task의 상태를 업데이트하는 함수
-// doing의 경우 시작 시간 추가 
-// done의 경우 끝난 시간 추가 
-const update = (array) => {
-  const index = data.todos.findIndex(item => item.id === Number(array[1]));
-  if (index >= 0) {
-    data.todos[index].status = array[2];
-  } else {
-    console.log('유효한 명령을 입력해주세요.');
-  }
-  printCurrentStatus();
-}
-
-// todolist의 현재상태를 출력하는 함수 
-const printCurrentStatus = () => {
-  const currentStatus = [];
-  data.status.forEach((status) => {
-    const task = data.todos.filter(item => item.status === status);
-    currentStatus.push(`${status}: ${task.length}개`);
-  })
-  console.log('현재상태 :', currentStatus.join(", "));
-}
-
-// 입력된 command의 싱태를 실행하는 함수 
+// 입력된 command의 싱태를 실행하는 함수
 const runCommand = array => {
   if (array.includes('add')) {
     add(array);
@@ -98,6 +45,66 @@ const runCommand = array => {
   } else {
     console.log('유효한 명령을 입력하세요.');
   }
+}
+
+// todolist의 todo를 추가하는 함수
+// 추가된 항목을 출력하고, 현재 상태를 출력
+const add = (array) => {
+  const [type, task] = array;
+  const newTodos = [
+    ...data.todos,
+    {
+      id: data.currentId,
+      status: 'todo',
+      task: task,
+      startAt: null,
+      endAt: null,
+    }
+  ];
+  data.todos = newTodos;
+  console.log(`id: ${data.currentId}, "${task}" 항목이 추가되었습니다.`);
+  printCurrentStatus();
+  data.currentId++;
+}
+
+// 출력을 원하는 상태의 id와 task를 출력하는 함수
+const show = (array) => {
+  const [type, status] = array;
+  const todos = data.todos.reduce((accumulator, value) => {
+    if (value.status === status) {
+      accumulator.push(`'${value.id}, ${value.task}'`);
+    }
+    return accumulator;
+  }, []);
+  if (todos.length) {
+    console.log(todos.join(", "));
+  } else {
+    console.log(`${status} 상태의 작업이 없습니다.`);
+  }
+}
+
+// task의 상태를 업데이트하는 함수
+// doing의 경우 시작 시간 추가
+// done의 경우 끝난 시간 추가
+const update = (array) => {
+  const [type, id, status] = array;
+  const index = data.todos.findIndex(item => item.id === Number(id));
+  if (index >= 0) {
+    data.todos[index].status = status;
+  } else {
+    console.log('유효한 명령을 입력해주세요.');
+  }
+  printCurrentStatus();
+}
+
+// todolist의 현재상태를 출력하는 함수
+const printCurrentStatus = () => {
+  const currentStatus = [];
+  data.status.forEach((status) => {
+    const task = data.todos.filter(item => item.status === status);
+    currentStatus.push(`${status}: ${task.length}개`);
+  })
+  console.log('현재상태 :', currentStatus.join(", "));
 }
 
 const command = pipe(
