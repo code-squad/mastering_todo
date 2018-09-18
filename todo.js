@@ -73,7 +73,7 @@ const command = (commandStr) => {
         console.log('현재 상태: todo: ', status.todo, ', doing: ', status.doing, ', done: ', status.done, '\n');
     };
 
-    const abc = {
+    const fns = {
         'add': (contents) => {
             const id = generateId();
             tasks.push(new Task(id, TODO, contents));
@@ -110,7 +110,7 @@ const command = (commandStr) => {
 
     const [method, param1, param2] = commandStr.replace(/\s/g, '').toLowerCase().split('$');
 
-    abc[method](param1, param2);
+    fns[method](param1, param2);
 };
 
 
@@ -132,6 +132,3 @@ tasks[0].time.done = new Date(new Date().getTime() +(1000 * 27) + (1000 * 60 * 9
 tasks[1].time.done = new Date(new Date().getTime() + (1000 * 10) + (1000 * 60 * 27));
 
 command("show$done");
-
-
-
