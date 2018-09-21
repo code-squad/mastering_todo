@@ -5,24 +5,19 @@ const STATUS = {
 }
 
 const TODO = {
-  totalStatus: {
-    todo: 0,
-    doing: 0,
-    done: 0
-  },
   tasks: []
 }
 function command(orderSentence) {
-  const [firstWord, secondWord, thirdWord] = refineSentence(orderSentence)
-  switch (firstWord) {
+  const [command, arg1, arg2] = refineSentence(orderSentence)
+  switch (command) {
     case 'add':
-      add((taskTitle = secondWord))
+      add((taskTitle = arg1))
       break
     case 'show':
-      show((status = secondWord))
+      show((status = arg1))
       break
     case 'update':
-      update((taskId = Number(secondWord)), (status = thirdWord))
+      update((taskId = Number(arg1)), (status = arg2))
       break
   }
 }
@@ -36,10 +31,11 @@ const refineSentence = sentence =>
 function add(taskTitle) {
   const newTask = { id: TODO.tasks.length + 1, taskTitle, status: 'todo' }
   setTask(newTask)
-  increaseStatus(newTask.status)
   logAddResult(newTask)
-  logPresentStatus(TODO.totalStatus)
+  showPresentStatus()
 }
+
+
 
 const setTask = newTask => {
   const prevTasks = TODO.tasks
@@ -80,19 +76,29 @@ const setUpdateTask = updatedTasks => (TODO.tasks = updatedTasks)
 const updateTotalStatus = (taskId, afterStatus) => {
   const beforeStatus = findTask(taskId).status
   decreaseStatus(beforeStatus)
-  increaseStatus(afterStatus)
+  // increaseStatus(afterStatus)
 }
 
 const findTask = taskId => TODO.tasks.filter(task => task.id === taskId)[0]
 
-const increaseStatus = statusType => {
-  const prevStatus = TODO.totalStatus
-  TODO.totalStatus = { ...prevStatus, [statusType]: prevStatus[statusType] + 1 }
-}
+// const increaseStatus = statusType => {
+//   const prevStatus = TODO.totalStatus
+//   TODO.totalStatus = { ...prevStatus, [statusType]: prevStatus[statusType] + 1 }
+// }
 
 const decreaseStatus = statusType => {
   const prevStatus = TODO.totalStatus
   TODO.totalStatus = { ...prevStatus, [statusType]: prevStatus[statusType] - 1 }
+}
+
+function showPresentStatus () {
+  const presentStatus = TODO.tasks.reduce(countStatus, { todo: 0,doing: 0,done: 0 })
+  logPresentStatus(presentStatus)
+}
+
+const countStatus = (statusObj, task) => {
+  statusObj[task.status] += 1
+  return statusObj
 }
 
 const logPresentStatus = ({ todo, doing, done }) => {
@@ -103,8 +109,8 @@ command('add$자바스크립트 공부하기')
 command('add$html 공부하기')
 command('add$react 공부하기')
 
-command('update$2$doing')
-command('update$3$done')
+// command('update$2$doing')
+// command('update$3$done')
 
-command('shOW     $doing')
+// command('shOW     $doing')
 // command('show$done')
