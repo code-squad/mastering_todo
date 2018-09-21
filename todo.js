@@ -30,12 +30,15 @@ const refineSentence = sentence =>
 
 function add(taskTitle) {
   const newTask = { id: TODO.tasks.length + 1, taskTitle, status: 'todo' }
-  setTask(newTask)
-  logAddResult(newTask)
+  forEachPipe(
+    setTask,
+    logAddResult,
+  )(newTask)
+  
   showPresentStatus()
 }
 
-
+const forEachPipe = (...functions) => obj => functions.forEach(func => func(obj))
 
 const setTask = newTask => {
   const prevTasks = TODO.tasks
