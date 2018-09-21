@@ -59,11 +59,28 @@ const getTypeTask = statusType =>
 const logTask = ({ id, taskTitle }) => console.log(`> "${id}, ${taskTitle}"`)
 
 function update(taskId, statusType) {
-  const nextTodoTasks = JSON.parse(JSON.stringify(TODO.tasks)) // 깊은 복사 때문에..
-  nextTodoTasks.find(task => task.id === taskId).status = statusType
-  TODO.tasks = nextTodoTasks
+  const todos = TODO.tasks
+  compose( 
+    setTodo, 
+    findTodo, 
+    copyTodos
+  )({todos, taskId, statusType})
 
   showPresentStatus()
+}
+
+const compose = (...funcs) => param => funcs.reduceRight((acc,func) => func(acc), param)
+
+const copyTodos = ({todos, taskId, statusType}) => {
+  const copiedTodos = JSON.parse(JSON.stringify(todos))
+  return {copiedTodos, taskId, statusType}
+}
+const findTodo = ({copiedTodos, taskId, statusType}) => {
+  copiedTodos.find(task => task.id === taskId).status = statusType
+  return copiedTodos
+}
+const setTodo = (copiedTodos) => {
+  TODO.tasks = copiedTodos
 }
 
 function showPresentStatus () {
