@@ -59,39 +59,11 @@ const getTypeTask = statusType =>
 const logTask = ({ id, taskTitle }) => console.log(`> "${id}, ${taskTitle}"`)
 
 function update(taskId, statusType) {
-  updateTotalStatus(taskId, statusType)
-  updateTask(taskId, statusType)
-  logPresentStatus(TODO.totalStatus)
-}
+  const nextTodoTasks = JSON.parse(JSON.stringify(TODO.tasks)) // 깊은 복사 때문에..
+  nextTodoTasks.find(task => task.id === taskId).status = statusType
+  TODO.tasks = nextTodoTasks
 
-const updateTask = (taskId, statusType) => {
-  const updatedTasks = TODO.tasks.map(task => {
-    if (task.id === taskId) return updateStatus(task, statusType)
-    return task
-  })
-  setUpdateTask(updatedTasks)
-}
-
-const updateStatus = (task, statusType) => ({ ...task, status: statusType })
-
-const setUpdateTask = updatedTasks => (TODO.tasks = updatedTasks)
-
-const updateTotalStatus = (taskId, afterStatus) => {
-  const beforeStatus = findTask(taskId).status
-  decreaseStatus(beforeStatus)
-  // increaseStatus(afterStatus)
-}
-
-const findTask = taskId => TODO.tasks.filter(task => task.id === taskId)[0]
-
-// const increaseStatus = statusType => {
-//   const prevStatus = TODO.totalStatus
-//   TODO.totalStatus = { ...prevStatus, [statusType]: prevStatus[statusType] + 1 }
-// }
-
-const decreaseStatus = statusType => {
-  const prevStatus = TODO.totalStatus
-  TODO.totalStatus = { ...prevStatus, [statusType]: prevStatus[statusType] - 1 }
+  showPresentStatus()
 }
 
 function showPresentStatus () {
@@ -112,8 +84,8 @@ command('add$자바스크립트 공부하기')
 command('add$html 공부하기')
 command('add$react 공부하기')
 
-// command('update$2$doing')
+command('update$2$doing')
 // command('update$3$done')
 
-// command('shOW     $doing')
+// command('shOW     $done')
 // command('show$done')
