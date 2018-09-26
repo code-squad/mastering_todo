@@ -19,7 +19,8 @@ import * as util from './utils.js';
 const data = {
   todos: [],
   currentId: 0,
-  status: ['todo', 'doing', 'done']
+  status: ['todo', 'doing', 'done'],
+  commandStatus: '',
 }
 
 // 명령어 text의 공백, 소문자 등을 정라히는 함수
@@ -63,14 +64,18 @@ const add = (userCommand) => {
 }
 
 const calcTime = (todo) => {
-  const differenceHour = todo.endAt.getHours() - todo.startAt.getHours();
-  const differenceMinutes = todo.endAt.getMinutes() - todo.startAt.getMinutes();
-  return `${differenceHour}시간 ${differenceMinutes}분`
+  const diff = Math.abs((todo.endAt - todo.startAt) / 1000);
+  const diffDays = Math.floor(diff / 86400);
+  const diffHours = Math.floor(diff / 3600) % 24;
+  const diffMinutes = Math.floor(diff / 60) % 60;
+  const diffSeconds = Math.floor(diff % 60);
+  return `${diffDays}일 ${diffHours}시간 ${diffMinutes}분 ${diffSeconds}초`
 }
 
 // 출력을 원하는 상태의 id와 task를 출력하는 함수
 const show = (userCommand) => {
   const [type, status] = userCommand;
+  data.commandStatus = status;
   const todos = data.todos.reduce(arrangePrintText, []);
   if (todos.length) {
     console.log(todos.join(", "));
@@ -79,11 +84,11 @@ const show = (userCommand) => {
   }
 }
 
-// 출력을 원하는 텍스트를 정리하는 함수 
+// 출력을 원하는 텍스트를 정리하는 함수
 const arrangePrintText = (accumulator, value) => {
-  if (status !== 'done' && value.status === status) {
+  if (data.commandStatus !== 'done' && value.status === data.commandStatus) {
     accumulator.push(`'${value.id}, ${value.task}'`);
-  } else if (status === 'done' && value.status === status) {
+  } else if (data.commandStatus === 'done' && value.status === data.commandStatus) {
     accumulator.push(`'${value.id}, ${value.task}', ${calcTime(value)}`);
   }
   return accumulator;
