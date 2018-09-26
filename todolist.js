@@ -71,19 +71,22 @@ const calcTime = (todo) => {
 // 출력을 원하는 상태의 id와 task를 출력하는 함수
 const show = (userCommand) => {
   const [type, status] = userCommand;
-  const todos = data.todos.reduce((accumulator, value) => {
-    if (status !== 'done' && value.status === status) {
-      accumulator.push(`'${value.id}, ${value.task}'`);
-    } else if (status === 'done' && value.status === status) {
-      accumulator.push(`'${value.id}, ${value.task}', ${calcTime(value)}`);
-    }
-    return accumulator;
-  }, []);
+  const todos = data.todos.reduce(arrangePrintText, []);
   if (todos.length) {
     console.log(todos.join(", "));
   } else {
     console.log(`${status} 상태의 작업이 없습니다.`);
   }
+}
+
+// 출력을 원하는 텍스트를 정리하는 함수 
+const arrangePrintText = (accumulator, value) => {
+  if (status !== 'done' && value.status === status) {
+    accumulator.push(`'${value.id}, ${value.task}'`);
+  } else if (status === 'done' && value.status === status) {
+    accumulator.push(`'${value.id}, ${value.task}', ${calcTime(value)}`);
+  }
+  return accumulator;
 }
 
 // task의 상태를 업데이트하는 함수
