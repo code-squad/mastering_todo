@@ -87,23 +87,29 @@ const show = (userCommand) => {
 }
 
 // task의 상태를 업데이트하는 함수
-// doing의 경우 시작 시간 추가
-// done의 경우 끝난 시간 추가
 const update = (userCommand) => {
   const [type, id, status] = userCommand;
   const index = data.todos.findIndex(item => item.id === Number(id));
+  handleDateTime(index, status);
+  printCurrentStatus();
+}
+
+// todo의 시간을 처리하는 함수
+const handleDateTime = (index, status) => {
   if (index >= 0) {
     data.todos[index].status = status;
     if (status === 'doing') {
-      data.todos[index].startAt = new Date();
+      data.todos[index].startAt = getNow();
     } else if (status === 'done') {
-      data.todos[index].endAt = new Date();
+      data.todos[index].endAt = getNow();
     }
   } else {
     console.log('유효한 명령을 입력해주세요.');
   }
-  printCurrentStatus();
+  console.log('data.todos:', data.todos);
 }
+
+const getNow = () => new Date();
 
 // todolist의 현재상태를 출력하는 함수
 const printCurrentStatus = () => {
@@ -130,5 +136,7 @@ command("add$자바스크립트 공부하기");
 command("shOW     $todo");
 command("update$0$doing");
 command("shOW     $doing");
-command("update$0$done");
-command("show$done");
+setTimeout(() => {
+  command("update$0$done");
+  command("show$done");
+}, 5000);
