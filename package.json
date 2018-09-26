@@ -1,0 +1,10 @@
+{
+  "name": "masteringjs_todo",
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "lite-server"
+  },
+  "dependencies": {
+    "lite-server": "^2.4.0"
+  }
+}

@@ -14,34 +14,29 @@
  *  - 유효하지 않은 입력은 오류를 발생시킨다.
  *  - code 형태는 function으로 개발하고, 함수형의 특징을 많이 살리도록 노력한다.
  */
+import * as util from './utils.js';
 
 const data = {
-  separator: '$',
   todos: [],
   currentId: 0,
   status: ['todo', 'doing', 'done']
 }
 
-const pipe = (...functions) => args => functions.reduce((arg, nextFn) => nextFn(arg), args);
-const split = text => text.split(data.separator);
-const trim = text => text.trim();
-const toLowerCase = text => text.toLowerCase();
-
 // 명령어 text의 공백, 소문자 등을 정라히는 함수
-const arrangeCommand = array => {
-  return array.map((item) => {
+const arrangeCommand = userCommand => {
+  return userCommand.map((item) => {
     return arrangeText(item);
   });
 }
 
 // 입력된 command의 싱태를 실행하는 함수
-const runCommand = array => {
-  if (array.includes('add')) {
-    add(array);
-  } else if (array.includes('show')) {
-    show(array);
-  } else if (array.includes('update')) {
-    update(array);
+const runCommand = userCommand => {
+  if (userCommand.includes('add')) {
+    add(userCommand);
+  } else if (userCommand.includes('show')) {
+    show(userCommand);
+  } else if (userCommand.includes('update')) {
+    update(userCommand);
   } else {
     console.log('유효한 명령을 입력하세요.');
   }
@@ -49,8 +44,8 @@ const runCommand = array => {
 
 // todolist의 todo를 추가하는 함수
 // 추가된 항목을 출력하고, 현재 상태를 출력
-const add = (array) => {
-  const [type, task] = array;
+const add = (userCommand) => {
+  const [type, task] = userCommand;
   const newTodos = [
     ...data.todos,
     {
@@ -74,8 +69,8 @@ const calcTime = (todo) => {
 }
 
 // 출력을 원하는 상태의 id와 task를 출력하는 함수
-const show = (array) => {
-  const [type, status] = array;
+const show = (userCommand) => {
+  const [type, status] = userCommand;
   const todos = data.todos.reduce((accumulator, value) => {
     if (status !== 'done' && value.status === status) {
       accumulator.push(`'${value.id}, ${value.task}'`);
@@ -94,8 +89,8 @@ const show = (array) => {
 // task의 상태를 업데이트하는 함수
 // doing의 경우 시작 시간 추가
 // done의 경우 끝난 시간 추가
-const update = (array) => {
-  const [type, id, status] = array;
+const update = (userCommand) => {
+  const [type, id, status] = userCommand;
   const index = data.todos.findIndex(item => item.id === Number(id));
   if (index >= 0) {
     data.todos[index].status = status;
@@ -120,15 +115,15 @@ const printCurrentStatus = () => {
   console.log('현재상태 :', currentStatus.join(", "));
 }
 
-const command = pipe(
-  split,
+const command = util.pipe(
+  util.split,
   arrangeCommand,
   runCommand,
 )
 
-const arrangeText = pipe(
-  trim,
-  toLowerCase
+const arrangeText = util.pipe(
+  util.trim,
+  util.toLowerCase
 )
 
 command("add$자바스크립트 공부하기");
