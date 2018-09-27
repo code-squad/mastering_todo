@@ -26,7 +26,7 @@ const todo = (function() {
       const [content] = [...task];
 
       tasks.push({
-        id: ++id,
+        id: id++,
         content: content.trim(),
         state: 'todo',
       });
@@ -44,25 +44,32 @@ const todo = (function() {
       return totalLog + `"${id}, ${content}"` + commaAndSpace;
     };
 
-    return tasks.filter(stateType).reduce(showLog, '');
+    // TODO: log 방식 개선
+    console.log(tasks.filter(stateType).reduce(showLog, ''));
   };
 
-  const changeState = (beforeState, afterState) => {
-    // TODO: add start time && remove end time
-    if (beforeState !== 'doing' && afterState === 'doing') return;
-    // TODO: add start time && add start end time
-    if (beforeState === 'doing' && afterState === 'done') return;
+  const changeState = (task, newState) => {
+    const isDoing = task.state !== 'doing' && newState === 'doing';
+    const isDone = task.state === 'doing' && newState === 'done';
+
+    // 상태변경
+    return {
+      ...task,
+      state: newState,
+      startHours: isDoing ? new Date() : 0,
+      endHours: isDone ? new Date() : 0,
+    };
   };
 
-  // TODO: 상태가 doing으로 변경될때 시간 기억
   const update = (() => {
     return (args) => {
-      const [index, state] = args;
-      const isFindTaskByIndex = ({ id }) => id === Number(index);
+      const [selectedId, newState] = args;
+      const isFindTaskById = ({ id }) => id === Number(selectedId);
 
       tasks.find((task) => {
-        if (isFindTaskByIndex(task)) {
-          task.state = state;
+        if (isFindTaskById(task)) {
+          const newTask = changeState(task, newState);
+          tasks[task.id] = newTask;
         }
       });
       consoleTodo();
@@ -77,6 +84,8 @@ const todo = (function() {
   };
 })();
 
+// tasks에 접근할 수 있는 get & set method 필요
+// 상수처리 필요
 function command(instruction) {
   const isReadyString = instruction.toLowerCase().trim();
   const [action, ...args] = isReadyString.split('$');
