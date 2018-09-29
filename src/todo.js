@@ -25,6 +25,7 @@ const todo = (function() {
     const { todo = 0, doing = 0, done = 0 } = tasks.reduce((obj, { state }) => {
       obj[state] = obj[state] || 0;
       obj[state]++;
+
       return obj;
     }, {});
 
@@ -49,11 +50,11 @@ const todo = (function() {
   const show = function(state) {
     const [selectedState] = [...state];
     const stateType = ({ state }) => state === selectedState;
-    const isDone = 'done' === selectedState;
+    const bDone = 'done' === selectedState;
 
     const showLog = (totalLog, { id, content, startHours, endHours }, index, array) => {
       const commaAndSpace = array.length !== index + 1 ? ', ' : '';
-      const totalElapsedTime = isDone ? `, ${time.getTotalHHMM(endHours - startHours)}` : '';
+      const totalElapsedTime = bDone ? `, ${time.getTotalHHMM(endHours - startHours)}` : '';
 
       return totalLog + `"${id}, ${content}${totalElapsedTime}"` + commaAndSpace;
     };
@@ -63,14 +64,14 @@ const todo = (function() {
   };
 
   const changeState = (task, newState) => {
-    const isDoing = task.state !== 'doing' && newState === 'doing';
-    const isDone = task.state === 'doing' && newState === 'done';
+    const bDoing = task.state !== 'doing' && newState === 'doing';
+    const bDone = task.state === 'doing' && newState === 'done';
 
     return {
       ...task,
       state: newState,
-      startHours: isDoing ? new Date().getTime() : 0,
-      endHours: isDone ? new Date().getTime() : 0,
+      startHours: bDoing ? new Date().getTime() : 0,
+      endHours: bDone ? new Date().getTime() : 0,
     };
   };
 
