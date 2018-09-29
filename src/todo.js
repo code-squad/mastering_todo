@@ -1,10 +1,22 @@
-const getHHMM = () => {
-  const date = new Date();
-  const hours = (date.getHours() + 24) % 12 || 12;
-  const minutes = date.getMinutes();
+const time = (function() {
+  const convertMsKoFormat = (duration) => {
+    const milliseconds = parseInt((duration % 1000) / 100),
+      minutes = parseInt((duration / (1000 * 60)) % 60),
+      hours = parseInt((duration / (1000 * 60 * 60)) % 24);
 
-  return `${hours}시간${minutes}분`;
-};
+    return `${hours}시간${minutes}분`;
+  };
+
+  const getTotalHHMM = (time) => {
+    const date = new Date(time);
+
+    return convertMsKoFormat(date);
+  };
+
+  return {
+    getTotalHHMM,
+  };
+})();
 
 const todo = (function() {
   const tasks = [];
@@ -34,14 +46,16 @@ const todo = (function() {
     };
   })();
 
-  // TODO: 상태가 done일때 시간을 노출
   const show = function(state) {
     const [selectedState] = [...state];
     const stateType = ({ state }) => state === selectedState;
-    const showLog = (totalLog, { id, content }, index, array) => {
-      const commaAndSpace = array.length !== index + 1 ? ', ' : '';
+    const isDone = 'done' === selectedState;
 
-      return totalLog + `"${id}, ${content}"` + commaAndSpace;
+    const showLog = (totalLog, { id, content, startHours, endHours }, index, array) => {
+      const commaAndSpace = array.length !== index + 1 ? ', ' : '';
+      const totalElapsedTime = isDone ? `, ${time.getTotalHHMM(endHours - startHours)}` : '';
+
+      return totalLog + `"${id}, ${content}${totalElapsedTime}"` + commaAndSpace;
     };
 
     // TODO: log 방식 개선
@@ -52,12 +66,11 @@ const todo = (function() {
     const isDoing = task.state !== 'doing' && newState === 'doing';
     const isDone = task.state === 'doing' && newState === 'done';
 
-    // 상태변경
     return {
       ...task,
       state: newState,
-      startHours: isDoing ? new Date() : 0,
-      endHours: isDone ? new Date() : 0,
+      startHours: isDoing ? new Date().getTime() : 0,
+      endHours: isDone ? new Date().getTime() : 0,
     };
   };
 
@@ -66,7 +79,7 @@ const todo = (function() {
       const [selectedId, newState] = args;
       const isFindTaskById = ({ id }) => id === Number(selectedId);
 
-      tasks.find((task) => {
+      tasks.forEach((task) => {
         if (isFindTaskById(task)) {
           const newTask = changeState(task, newState);
           tasks[task.id] = newTask;
