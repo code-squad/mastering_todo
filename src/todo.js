@@ -102,8 +102,8 @@ const todo = (function() {
   };
 })();
 
-// tasks에 접근할 수 있는 get & set method 필요
-// 상수처리 필요
+// TODO: tasks에 접근할 수 있는 get & set method 필요
+// TODO: 상수처리 필요
 function command(instruction) {
   const isReadyString = instruction.toLowerCase().trim(),
     [action, ...args] = isReadyString.split('$'),
@@ -112,6 +112,7 @@ function command(instruction) {
   todo[actionType](args);
 }
 
+// TODO: 유효성 검사 에러처리
 command('add$자바스크립트 공부하기');
 command('add$자바 공부하기');
 command('add$C 공부하기');
