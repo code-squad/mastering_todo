@@ -25,7 +25,6 @@ const todo = (function() {
     const { todo = 0, doing = 0, done = 0 } = tasks.reduce((obj, { state }) => {
       obj[state] = obj[state] || 0;
       obj[state]++;
-
       return obj;
     }, {});
 
