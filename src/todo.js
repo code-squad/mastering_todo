@@ -32,12 +32,14 @@ const todo = (function() {
     console.log(`현재상태 :  todo:${todo}개, doing:${doing}개, done:${done}개`);
   };
 
+  // TODO: DELETE IIFE
   const add = (() => {
     let id = 0;
 
     return (task) => {
       const [content] = [...task];
 
+      // TODO: convert immutable
       tasks.push({
         id: id++,
         content: content.trim(),
@@ -48,13 +50,13 @@ const todo = (function() {
   })();
 
   const show = function(state) {
-    const [selectedState] = [...state];
-    const stateType = ({ state }) => state === selectedState;
-    const bDone = 'done' === selectedState;
+    const [selectedState] = [...state],
+      stateType = ({ state }) => state === selectedState,
+      bDone = 'done' === selectedState;
 
     const showLog = (totalLog, { id, content, startHours, endHours }, index, array) => {
-      const commaAndSpace = array.length !== index + 1 ? ', ' : '';
-      const totalElapsedTime = bDone ? `, ${time.getTotalHHMM(endHours - startHours)}` : '';
+      const commaAndSpace = array.length !== index + 1 ? ', ' : '',
+        totalElapsedTime = bDone ? `, ${time.getTotalHHMM(endHours - startHours)}` : '';
 
       return totalLog + `"${id}, ${content}${totalElapsedTime}"` + commaAndSpace;
     };
@@ -64,8 +66,8 @@ const todo = (function() {
   };
 
   const changeState = (task, newState) => {
-    const bDoing = task.state !== 'doing' && newState === 'doing';
-    const bDone = task.state === 'doing' && newState === 'done';
+    const bDoing = task.state !== 'doing' && newState === 'doing',
+      bDone = task.state === 'doing' && newState === 'done';
 
     return {
       ...task,
@@ -75,11 +77,13 @@ const todo = (function() {
     };
   };
 
+  // TODO: DELETE IIFE
   const update = (() => {
     return (args) => {
-      const [selectedId, newState] = args;
-      const isFindTaskById = ({ id }) => id === Number(selectedId);
+      const [selectedId, newState] = args,
+        isFindTaskById = ({ id }) => id === Number(selectedId);
 
+      // TODO: get 메서드로 접근, set 메서드 활용
       tasks.forEach((task) => {
         if (isFindTaskById(task)) {
           const newTask = changeState(task, newState);
@@ -101,9 +105,9 @@ const todo = (function() {
 // tasks에 접근할 수 있는 get & set method 필요
 // 상수처리 필요
 function command(instruction) {
-  const isReadyString = instruction.toLowerCase().trim();
-  const [action, ...args] = isReadyString.split('$');
-  const actionType = action.trim();
+  const isReadyString = instruction.toLowerCase().trim(),
+    [action, ...args] = isReadyString.split('$'),
+    actionType = action.trim();
 
   todo[actionType](args);
 }
